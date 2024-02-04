@@ -97,6 +97,37 @@ func (x *GoSNMP) SendTrap(trap SnmpTrap) (result *SnmpPacket, err error) {
 	// -> wait is only for informs
 	return x.send(packetOut, trap.IsInform)
 }
+func (x *GoSNMP) SendResponce(trap SnmpResponce) (result *SnmpPacket, err error) {
+
+	switch x.Version {
+
+	case Version1:
+		if len(trap.Enterprise) == 0 {
+			return nil, fmt.Errorf("function SendTrap for SNMPV1 requires an Enterprise OID")
+		}
+		if len(trap.AgentAddress) == 0 {
+			return nil, fmt.Errorf("function SendTrap for SNMPV1 requires an Agent Address")
+		}
+
+	default:
+		err = fmt.Errorf("function SendTrap doesn't support %s", x.Version)
+		return nil, err
+	}
+
+	packetOut := x.mkSnmpPacket(trap.PDUType, trap.Variables, 0, 0)
+	if x.Version == Version1 {
+		packetOut.Enterprise = trap.Enterprise
+		packetOut.AgentAddress = trap.AgentAddress
+		packetOut.GenericTrap = trap.GenericTrap
+		packetOut.SpecificTrap = trap.SpecificTrap
+		packetOut.Timestamp = trap.Timestamp
+	}
+
+	// all sends wait for the return packet, except for SNMPv2Trap
+	// -> wait is only for informs
+	return x.send(packetOut, false)
+
+}
 
 //
 // Receiving Traps ie GoSNMP acting as an NMS (Network Management

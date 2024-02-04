@@ -77,6 +77,16 @@ type SnmpTrap struct {
 	SpecificTrap int
 	Timestamp    uint
 }
+type SnmpResponce struct {
+	Variables []SnmpPDU
+	PDUType   PDUType
+	// These fields are required for SNMPV1 Trap Headers
+	Enterprise   string
+	AgentAddress string
+	GenericTrap  int
+	SpecificTrap int
+	Timestamp    uint
+}
 
 // VarBind struct represents an SNMP Varbind.
 type VarBind struct {
