@@ -60,9 +60,6 @@ func (x *GoSNMP) SendTrap(trap SnmpTrap) (result *SnmpPacket, err error) {
 		}
 
 		// If it's an inform, do that instead.
-		if trap.IsInform {
-			pdutype = InformRequest
-		}
 
 		if trap.Variables[0].Type != TimeTicks {
 			now := uint32(time.Now().Unix())
@@ -72,7 +69,9 @@ func (x *GoSNMP) SendTrap(trap SnmpTrap) (result *SnmpPacket, err error) {
 		}
 
 	case Version1:
-		pdutype = Trap
+		if trap.IsInform {
+			pdutype = GetRequest
+		}
 		if len(trap.Enterprise) == 0 {
 			return nil, fmt.Errorf("function SendTrap for SNMPV1 requires an Enterprise OID")
 		}
