@@ -98,7 +98,6 @@ func (x *GoSNMP) SendTrap(trap SnmpTrap) (result *SnmpPacket, err error) {
 	return x.send(packetOut, trap.IsInform)
 }
 func (x *GoSNMP) SendResponce(trap SnmpResponce) (result *SnmpPacket, err error) {
-
 	switch x.Version {
 
 	case Version1:
